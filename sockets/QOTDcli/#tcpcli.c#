@@ -1,0 +1,135 @@
+/***********************************************************************************
+ *
+ * Author: Dr. Lisa Frye
+ * Creation Date: November 27, 2000
+ * Modified Date: August 29, 2015
+ * Filename: tcpcli.c
+ * Purpose: Client example for TCP Sockets; sends one charater at a time
+ * Adapted from Haviland book
+ *
+ **********************************************************************************/ 
+/***************************************************************************\
+ * Author: ERIC BURGOS
+ * Creation Date: November 27, 2000
+ * Modified Date: November, 6 2016
+ * Filename: tcpcli.c
+ * Purpose: Client example for TCP Sockets; receives a quote 
+ * and displays it from specified QOTD server.
+ *
+ ***************************************************************************\
+ *******/
+
+
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+#include <errno.h>
+#include <netdb.h>
+#include <arpa/inet.h>
+#include <ctype.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+
+int hostnameToIP(char * , char *);
+
+#define SIZE sizeof(struct sockaddr_in)
+#define PORT "17"
+
+int main(int argc, char *argv[] )
+{
+  int sockfd;
+  char *rc[100];
+  struct sockaddr_in server;
+  char *hostname = argv[1];
+  char ip[100];
+  // Will check to see if there is at least one command-line argument specified 
+  if (argc < 2)
+    {
+      printf("Please specify a hostname\n");
+      fprintf(stderr, "sage: %s [hostname]\n", argv[0]);
+      exit(EXIT_FAILURE);
+    }
+
+  // Will make sure that there are no more than just one command-line argument
+  if (argc > 2)
+    {
+      printf("Too many arguments\n");
+      exit(-1);
+    }
+
+  // Call to function that will change hostname to IP address
+  hostnameToIP(hostname, ip);
+
+  // Will print hostname and IP
+  printf("Hostname: %s\n", hostname );
+  printf("IP address of %s: %s\n", hostname, ip);
+
+  // convert and store the server's IP address
+  server.sin_family = AF_INET;
+  server.sin_port = htons(17);
+  server.sin_addr.s_addr = inet_addr(ip);
+  
+  // set up the transport end point for communication
+  // IPv4 Internet protocols
+  // SOCK_STREAM. socket type. Reliable 2 way connection-based byte streams.
+  if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
+    {
+      perror("socket call failed");
+      exit(-1);
+    }   // end if
+
+  // Initiate connection
+  // connect the socket to the server's address
+  if (connect(sockfd, (struct sockaddr *)&server, SIZE) == -1)
+    {
+      perror("connect call failed");
+      exit(-1);
+    }   // end if
+
+  // Receives a messsage from socked using socked descriptor(sockfd)
+  // rc variable will store the buffer
+  // 1000 is the size allocated for buffer
+  // recv will return the number of bytes
+  // Will print out buffer if there are bytes to print out(bytes > 0)
+  if (recv(sockfd, &rc, 1000, 0) > 0)
+    printf("%s\n", rc);
+  else
+    {  
+      perror("Error receiving message from server");
+      close(sockfd);
+      exit(-1);
+    }  
+  close(sockfd);
+}  // end main
+
+
+int hostnameToIP(char * hostname , char* ip)
+{
+  struct addrinfo hints, *servinfo, *p;
+  struct sockaddr_in *h;
+  int c;
+  // Fill memory pointed to by hints  
+  memset(&hints, 0, sizeof hints);
+  // Specify address family(internet) and socket type(TCP)
+  hints.ai_family = AF_INET; 
+  hints.ai_socktype = SOCK_STREAM;
+ 
+  // Gets hostname ready for network translation
+  if ( (c = getaddrinfo( hostname , "http" , &hints , &servinfo)) != 0) 
+    {
+      fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(c));
+      exit(-1);
+    }
+ 
+  // loop through all the results and connect to first available result
+  for(p = servinfo; p != NULL; p = p->ai_next) 
+    {
+      h = (struct sockaddr_in *) p->ai_addr;
+      strcpy(ip , inet_ntoa( h->sin_addr ) );
+    }
+     
+  // Frees memory that was allocated
+  freeaddrinfo(servinfo); 
+  return 0;
+}

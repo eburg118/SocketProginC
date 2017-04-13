@@ -1,0 +1,34 @@
+Script started on Wed 09 Nov 2016 05:09:20 PM EST
+[?1034hbash-4.1$ gcc -c sockutils.c 
+bash-4.1$ ls -l
+total 12
+-rw-r--r-- 1 eburg118 csit_students    0 Nov  9 17:09 sockLibs.txt
+-rw-r--r-- 1 eburg118 csit_students 4579 Nov  8 21:26 sockutils.c
+-rw-r--r-- 1 eburg118 csit_students 3464 Nov  9 17:09 sockutils.o
+bash-4.1$ ar -cvq staticLib.a sockutils.c[Ko
+a - sockutils.o
+bash-4.1$ l[Kls -l
+total 16
+-rw-r--r-- 1 eburg118 csit_students    0 Nov  9 17:09 sockLibs.txt
+-rw-r--r-- 1 eburg118 csit_students 4579 Nov  8 21:26 sockutils.c
+-rw-r--r-- 1 eburg118 csit_students 3464 Nov  9 17:09 sockutils.o
+-rw-r--r-- 1 eburg118 csit_students 3656 Nov  9 17:10 staticLib.a
+bash-4.1$ gcc -fpic -c sockutils.c 
+bash-4.1$ ls -l
+total 16
+-rw-r--r-- 1 eburg118 csit_students    0 Nov  9 17:09 sockLibs.txt
+-rw-r--r-- 1 eburg118 csit_students 4579 Nov  8 21:26 sockutils.c
+-rw-r--r-- 1 eburg118 csit_students 3528 Nov  9 17:10 sockutils.o
+-rw-r--r-- 1 eburg118 csit_students 3656 Nov  9 17:10 staticLib.a
+bash-4.1$ gcc -shared -o shareLib.so sockutils.o 
+bash-4.1$ ls -l
+total 24
+-rwxr-xr-x 1 eburg118 csit_students 8132 Nov  9 17:11 shareLib.so
+-rw-r--r-- 1 eburg118 csit_students    0 Nov  9 17:09 sockLibs.txt
+-rw-r--r-- 1 eburg118 csit_students 4579 Nov  8 21:26 sockutils.c
+-rw-r--r-- 1 eburg118 csit_students 3528 Nov  9 17:10 sockutils.o
+-rw-r--r-- 1 eburg118 csit_students 3656 Nov  9 17:10 staticLib.a
+bash-4.1$ exit
+exit
+
+Script done on Wed 09 Nov 2016 05:11:16 PM EST
